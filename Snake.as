@@ -58,11 +58,25 @@ package {
       _head.height = 15;
       _head.flip = AxEntity.NONE;
 
+      _tail = new AxSprite(_head.x - 15, _head.y);
+      // This should be somewhere else.
+      _tail.load(Tail, 45, 45);
+      _tail.width = 15;
+      _tail.height = 15;
+      _tail.offset.x = 15;
+      _tail.offset.y = 15
+      _tail.addAnimation('left',[0],1);
+      _tail.addAnimation('right',[1],1);
+      _tail.addAnimation('up',[2],1);
+      _tail.addAnimation('down',[3],1);
+      _tail.flip = AxEntity.NONE;
+
       _body = new AxGroup();
 
       fillBody();
       resurrect();
-
+      
+      add(_tail);
       add(_body);
       add(_head);
     }
@@ -162,6 +176,9 @@ package {
         _body.members[i].x = _head.x;
         _body.members[i].y = _head.y;
       }
+      _tail.x = _head.x;
+      _tail.y = _head.y;
+      _tail.facing = AxEntity.RIGHT;
       _tail.alpha == 0;
       mps = _startMps;
       setEmoLevel();
@@ -172,24 +189,9 @@ package {
       var i:int;
       for(i = 1; i <= 4; i++){
         var part:AxSprite;
-        if(i == 4) {
-          part = new SmoothBlock(_head.tileX - 1, _head.tileY);
-          // This should be somewhere else.
-          part.load(Tail, 45, 45);
-          part.width = 15;
-          part.height = 15;
-          part.offset.x = 15;
-          part.offset.y = 15
-          part.addAnimation('left',[0],1);
-          part.addAnimation('right',[1],1);
-          part.addAnimation('up',[2],1);
-          part.addAnimation('down',[3],1);
-          _tail = part;
-          _tail.flip = AxEntity.NONE;
-        } else {
-          part = new Egg(0, _head.x - 15, _head.y);
-          (part as Egg).eat();
-        }
+        part = new Egg(0, _head.x - 15, _head.y);
+        (part as Egg).eat();
+        
         part.facing = AxEntity.RIGHT;
         _body.add(part);
       } 
@@ -221,15 +223,14 @@ package {
         }
     }
 
+    
     private function move():void {
       _previousFacing = _head.facing;
       if(_newPart){ 
         (_newPart as Egg).eat();
         (_newPart as Egg).mps = mps;
         var swap:AxSprite;
-        _body.remove(_tail);
         _body.add(_newPart);
-        _body.add(_tail);
         _newPart = null;
         _justAte = true;
       }  
@@ -242,9 +243,7 @@ package {
         part = (_body.members[i] as SmoothBlock);
         preFacing = part.facing;
 
-          if (i != _body.members.length - 1) {
-            animateBodyMovement(part);
-          }
+        animateBodyMovement(part);
 
           if(i == 0){
             part.tileX = _head.tileX;
@@ -256,15 +255,40 @@ package {
             part.tileY = prePart.tileY;
             part.direction = prePart.facing;
             //body tile in angle
-            if (i != _body.members.length - 1 && preFacing != part.facing) {
+            if (preFacing != part.facing) {
               (part as Egg).animate("angle");
             } 
-          }
-
+         }
+        
       }
-
-      animateTail();      
+            
       _head.step();
+
+    }
+
+    private function moveTail():void {
+      //for the tail
+      var last:SmoothBlock = (_body.members[_body.members.length - 1] as SmoothBlock);
+      switch(last.facing) {
+        case AxEntity.UP:
+          _tail.x = last.x;
+          _tail.y = last.y + 15;
+        break;
+        case AxEntity.DOWN:
+          _tail.x = last.x;
+          _tail.y = last.y - 15;
+        break;
+        case AxEntity.LEFT:
+          _tail.x = last.x + 15;
+          _tail.y = last.y;
+        break;
+        case AxEntity.RIGHT:
+          _tail.x = last.x - 15;
+          _tail.y = last.y;
+        break;
+      }
+      _tail.facing = last.facing;
+      animateTail();
 
     }
 
@@ -391,7 +415,9 @@ package {
           _head.animate('left_' + String(_emoLevel));
           break;
       }
-
+      if (_alive) {
+        moveTail();
+      }
       _timer += Ax.dt;
       if(_timer >= _speed){
         if(_alive){
