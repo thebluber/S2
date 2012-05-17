@@ -47,7 +47,7 @@ package {
       _scoreText = new AxText(_boardLeft.x + 10, _boardLeft.y + 10, null, "Score: ");
       _scoreText.scale.x = _scoreText.scale.y = 2;
 
-      var mid:int = Ax.width / 2 - 60;      
+      var mid:int = 640 / 2 - 60;      
 
       _replay = new AxButton(mid, 330); 
       _replay.load(Replay, 120, 147)

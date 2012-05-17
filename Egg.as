@@ -1,7 +1,7 @@
 package {
   import org.axgl.*;
 
-  public class Egg extends AxSprite {
+  public class Egg extends SmoothBlock {
 
     [Embed(source='assets/images/eatenEggBlue.png')] protected static var EatenEggBlue:Class;
     [Embed(source='assets/images/eatenEggGreenPointed.png')] protected static var EatenEggGreenPointed:Class;
@@ -23,6 +23,9 @@ package {
    
     protected var _points:int;
     protected var _eggType:int;
+    
+    // Set this to true when starting to remove the egg from the body.
+    public var removing:Boolean = false;  
     
     public function Egg(eggType:int = 0, x:int = 0, y:int = 0 ){
       super(x, y);

@@ -7,6 +7,7 @@ package {
   import com.gskinner.motion.*;
   import com.gskinner.motion.easing.*;
   import flash.debugger.enterDebugger;
+  import flash.utils.*;
   
   public class LevelState extends AxState {
     [Embed(source='assets/SnakeSounds/schluck2tiefer.mp3')] protected var BiteSound:Class;
@@ -53,8 +54,8 @@ package {
 
     override public function create():void {
       super.create();
-
-      Ax.camera.follow(_snake);
+      
+      Ax.zoom = 1;
 
       _tweens = new Vector.<GTween>;
 
@@ -78,6 +79,8 @@ package {
 
       _score = 0;
       _snake = new Snake(10);
+      //Ax.camera.follow(_snake.head);
+      //Ax.camera.bounds = new AxRect(0,0,640,480);
       _food = new AxGroup();
 
       _bonusBar = new AxSprite(450,32);
@@ -194,7 +197,7 @@ package {
     }
 
     private function onScreen(sprite:AxSprite):Boolean {
-      return sprite.x > 0 && sprite.x < Ax.width && sprite.y > 0 && sprite.y < Ax.height; 
+      return sprite.x > 0 && sprite.x < 640 && sprite.y > 0 && sprite.y < 480; 
     }
 
     protected function collideScreen():void {
@@ -257,6 +260,7 @@ package {
       doCombos();
 
       updateHud();
+      Ax.camera.follow(_snake.head);
     }
 
     protected function checkWinConditions():void {
@@ -264,7 +268,9 @@ package {
     }
 
     protected function showPoints(egg:AxSprite, points:String, color:AxColor = null):void {
-      var pointo:AxText = new AxText(egg.x, egg.y, null, points);
+      var pointo:AxText = new AxText(egg.screen.x, egg.screen.y, null, points);
+      pointo.scroll.x = 0;
+      pointo.scroll.y = 0;
       pointo.scale.x = 4;
       pointo.scale.y = 4;
       if(color) {
@@ -273,7 +279,9 @@ package {
       var func:Function = function(tween:GTween):void {
         pointo.exists = false; 
       }
-      var tween:GTween = new GTween(pointo, 2, {x:(((_pointDirection + 1) % 4 < 2) ? 640 : 0), y:((_pointDirection % 4 < 2) ? 480 : 0), alpha: 0}, {onComplete: func});
+      //var tween:GTween = new GTween(pointo, 2, {x:(((_pointDirection + 1) % 4 < 2) ? 640 : 0), y:((_pointDirection % 4 < 2) ? 480 : 0), alpha: 0}, {onComplete: func});
+      var tween:GTween = new GTween(pointo, 2, {x: 320, y: 0, alpha: 0}, {onComplete: func});
+      
       _tweens.push(tween);
       _pointDirection = (_pointDirection + 1) % 4
       add(pointo);
@@ -310,6 +318,40 @@ package {
       _bonusTimer = 2;
 
     }
+
+    protected function removeAndExplodeCombo(combo:Array):void {
+      var interval:int;
+      var prefib:int = 1;
+      var fib:int = 1;
+      var temp:int = 0;
+
+      for(var i:int = 0; i < combo.length; i++) {
+        combo[i].removing = true;
+      }
+
+      var func:Function = function():void {
+        if(combo.length > 0) {
+          var egg:Egg = (combo.pop() as Egg);
+          if(egg) {
+            _score += fib;
+            showPoints(egg, '+' + String(fib), new AxColor(Math.random(), Math.random(), Math.random(), 1));
+            temp = fib; 
+            fib+= prefib;
+            prefib = temp;
+            AxParticleSystem.emit("combo", egg.x, egg.y);
+            _snake.body.remove(egg);
+            
+          } else {
+            clearInterval(interval);
+          }
+        } else {
+          clearInterval(interval);
+        }
+      }
+
+      func();
+      interval = setInterval(func, 300);
+    }
     
     /*
      * Should be overridden for different scoring.
@@ -321,13 +363,7 @@ package {
         for(j = 0; j < _currentCombos.length; j++) {
           combo = _currentCombos[j];
           _combos += 1;
-          for(i = 0; i < combo.length; i++) {
-            showPoints(combo[i], '+' + String(combo.length), new AxColor(Math.random(), Math.random(), Math.random(), 1));
-            _score += combo.length;
-            AxParticleSystem.emit("combo", combo[i].x, combo[i].y);
-            _snake.body.remove(combo[i]);
-            
-          }
+          removeAndExplodeCombo(combo);
         }
         _snake.faster();
         _currentCombos = null;
@@ -337,9 +373,10 @@ package {
         //FlxG.log("checking for combos...");
         var bodyArray:Array = new Array();
         for(i = 0; i < _snake.body.members.length - 1; i++) {
-          bodyArray.push(_snake.body.members[i]);
+          if(!(_snake.body.members[i] as Egg).removing) {
+            bodyArray.push(_snake.body.members[i]);
+          }
         }
-        trace(bodyArray);
         var combos:Array = checkCombos(bodyArray);
         if(combos.length > 0) {
           _currentCombos = combos;
@@ -402,8 +439,8 @@ package {
     }
 
     protected function spawnEgg(egg:Egg):void {
-      var wTiles:int = Ax.width / 15;
-      var hTiles:int = Ax.height / 15;
+      var wTiles:int = 640 / 15;
+      var hTiles:int = 480 / 15;
       wTiles -= 2; // Left and right;
       hTiles -= 7; // 6 top, 1 bottom;
       do {
