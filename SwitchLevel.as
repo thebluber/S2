@@ -59,6 +59,10 @@ package {
     private var _EXPCounter:Object;
     private var _EXP:int;
 
+    private var _totalText:AxText;
+    private var _totalCounter:Object;
+    private var _total:int;
+
     private var _preState:Class;
     private var _nextState:Class;    
     private var _tweens:Vector.<GTween>;
@@ -89,6 +93,9 @@ package {
       _liveBCounter = {i: 0};
       _liveBonusPic = new AxSprite(_timeBonusPic.x, _timeBonusPic.y + _timeBonusPic.height + 20, LifeBonus);
       _liveBonusText = new AxText(_liveBonusPic.x + _liveBonusPic.width + 10, _liveBonusPic.y - 10, _font, "");
+
+      _totalCounter = {i: 0};
+      _totalText = new AxText(_scoreboard.x + 140, _liveBonusText.y + 77, _font, "");
 
       _EXPCounter = {i: 0};
       _EXPText = new AxText(_scoreboard.x + 110, _liveBonusText.y + 145, _font, "");
@@ -126,6 +133,7 @@ package {
       add(_timeBonusText);
       add(_liveBonusText);
       add(_EXPText);
+      add(_totalText);
     
     }
     
@@ -188,6 +196,7 @@ package {
       _score = score;
       _timeBonus = timeBonus;
       _liveBonus = liveBonus;
+      _total = _timeBonus + _liveBonus + _score;
       _EXP = EXP;
     }
 
@@ -196,10 +205,12 @@ package {
       var tweenScore:GTween = new GTween(_scoreCounter, 2, {i: _score}, {ease: Exponential.easeOut});
       var tweenLive:GTween = new GTween(_liveBCounter, 2, {i: _liveBonus}, {ease: Exponential.easeOut});
       var tweenTime:GTween = new GTween(_timeBCounter, 2, {i: _timeBonus}, {ease: Exponential.easeOut});
+      var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut});
       var tweenEXP:GTween = new GTween(_EXPCounter, 2, {i: _EXP}, {ease: Exponential.easeOut});
       _tweens.push(tweenScore);
       _tweens.push(tweenLive);
       _tweens.push(tweenTime);
+      _tweens.push(tweenTotal);
       _tweens.push(tweenEXP);
     }
 
@@ -214,6 +225,7 @@ package {
         _liveBonusText.text = String(Math.floor(_liveBCounter.i));
         _timeBonusText.text = String(Math.floor(_timeBCounter.i));
         _EXPText.text = String(Math.floor(_EXPCounter.i));
+        _totalText.text = String(Math.floor(_totalCounter.i));
     }
 
     public function switchToState(state:Class, button:AxButton):Function {
@@ -225,6 +237,13 @@ package {
 
     public function gameOver():void {
       remove(_playNextLevel);      
+    }
+    override public function dispose():void {
+      for each(var tween:GTween in _tweens) {
+        tween.end();
+      }
+      _tweens = null;
+      super.dispose();
     }
 
   } 
