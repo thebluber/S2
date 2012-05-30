@@ -14,7 +14,6 @@ package {
   
   public class LevelState extends AxState {
     [Embed(source="/org/axgl/resource/Kroeger0665_Kopie.ttf", advancedAntiAliasing="true", fontFamily = "Kroeger", embedAsCFF="false")] public static const font:String;
-    [Embed(source='assets/SoundFX/Fressen/Biss1.mp3')] protected var BiteSound:Class;
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt1.mp3')] protected var Bup1:Class;
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt2.mp3')] protected var Bup2:Class;
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt3.mp3')] protected var Bup3:Class;
@@ -28,6 +27,7 @@ package {
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt11.mp3')] protected var Bup11:Class;
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt12.mp3')] protected var Bup12:Class;
     [Embed(source='assets/SoundFX/KomboSounds/SchwanzEffekt13.mp3')] protected var Bup13:Class;
+    [Embed(source='assets/SoundFX/Fressen/Biss2.mp3')] protected var BiteSound:Class;
     [Embed(source='assets/images/shell.png')] protected static var Shell:Class;
     [Embed(source='assets/images/hole.png')] protected var Hole:Class;
     
@@ -226,8 +226,8 @@ package {
     }
 
     protected function submitPoints():void {
-      var timeBonus:int = 30;
-      var liveBonus:int = _snake.lives * 100;
+      var timeBonus:int = ((_timerMin * 60 + _timerSec) >= 120) ? 0 : (120 - (_timerMin * 60 + _timerSec)) * 5
+      var liveBonus:int = (_snake.lives - 1) * 100;
       var _EXP:int = timeBonus + liveBonus + _score;
       _switchLevel.submitPoints(_score, timeBonus, liveBonus, _EXP);
     }
@@ -569,14 +569,12 @@ package {
             AxParticleSystem.emit("combo", egg.x, egg.y);
             _snake.body.remove(egg);
             soundCounter++;
-            setTimeout(func, (300 / (expoCounter * expoCounter)) + 100 );
+            setTimeout(func, (300 / (expoCounter * expoCounter)) + 80 );
           } else {
             _combos += 1;
-            //clearInterval(interval);
           }
         } else {
           _combos += 1;
-          //clearInterval(interval);
         }
       }
 
