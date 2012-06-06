@@ -202,16 +202,20 @@ package {
 
     public function tweenPoints():void {
       
+      var func:Function = function(tween:GTween):void {
+        var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut});
+        var tweenEXP:GTween = new GTween(_EXPCounter, 2, {i: _EXP}, {ease: Exponential.easeOut});
+        _tweens.push(tweenTotal);
+        _tweens.push(tweenEXP);
+
+      }
+
       var tweenScore:GTween = new GTween(_scoreCounter, 2, {i: _score}, {ease: Exponential.easeOut});
       var tweenLive:GTween = new GTween(_liveBCounter, 2, {i: _liveBonus}, {ease: Exponential.easeOut});
-      var tweenTime:GTween = new GTween(_timeBCounter, 2, {i: _timeBonus}, {ease: Exponential.easeOut});
-      var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut});
-      var tweenEXP:GTween = new GTween(_EXPCounter, 2, {i: _EXP}, {ease: Exponential.easeOut});
+      var tweenTime:GTween = new GTween(_timeBCounter, 2, {i: _timeBonus}, {ease: Exponential.easeOut, onComplete: func});
       _tweens.push(tweenScore);
       _tweens.push(tweenLive);
       _tweens.push(tweenTime);
-      _tweens.push(tweenTotal);
-      _tweens.push(tweenEXP);
     }
 
     public function set score(score:int):void {
@@ -223,7 +227,7 @@ package {
       trigger();
         _scoreText.text = String(Math.floor(_scoreCounter.i));
         _liveBonusText.text = String(Math.floor(_liveBCounter.i));
-        _timeBonusText.text = String(Math.floor(_timeBCounter.i));
+        _timeBonusText.text = String(Math.floor(_timeBCounter.i) * 5);
         _EXPText.text = String(Math.floor(_EXPCounter.i));
         _totalText.text = String(Math.floor(_totalCounter.i));
     }
