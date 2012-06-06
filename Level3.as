@@ -10,6 +10,7 @@ package {
 
     override public function create():void {
       super.create();
+      _spawnRotten = true;
       _comboSet.addCombo(new FasterCombo);
       _snake.lives = 3;
       _levelNumber = 3;
@@ -38,12 +39,10 @@ package {
     override protected function spawnFood():void {
       var newEgg:Egg;
       var n:Number = Math.random();
-      if(n < 0.1) {
-        newEgg = new Egg(Egg.ROTTEN);
-      } else if(n < 0.4) {
+      if(n < 0.4) {
         newEgg = new Egg(0);
       } else {
-        newEgg = new Egg(2);
+        newEgg = new Egg(1);
       }
       
       spawnEgg(newEgg);

@@ -1,6 +1,5 @@
 package {
   import org.axgl.*;
-  import com.sociodox.theminer.TheMiner;
 
 
   [SWF(width='960', height='640', backgroundColor='#000000')]

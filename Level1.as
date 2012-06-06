@@ -93,11 +93,12 @@ package {
       var rand:int = Math.floor(Math.random() * 11);
       var egg:Egg;
 
-      if (rand > 5) {
-        egg = new Egg(2);  
+      if (rand > 6) {
+        egg = new Egg(1);  
       } else {
-        egg = new Egg(Math.floor(Math.random() * 2)); 
-      }
+        egg = new Egg(0); 
+      } 
+ 
       egg.points = 2;
       spawnEgg(egg);
       

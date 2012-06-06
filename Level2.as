@@ -33,15 +33,17 @@ package {
     }
 
     override protected function spawnFood():void {
-      var rand:int = Math.floor(Math.random() * 10);
+      var rand:int = Math.floor(Math.random() * 11);
       var egg:Egg;
 
       if (rand > 4) {
-        egg = new Egg(2);  
+        egg = new Egg(1);  
+      } else if (rand >= 2){
+        egg = new Egg(0); 
       } else {
-        egg = new Egg(Math.floor(Math.random() * 2)); 
+        egg = new Egg(4);
       }
-
+      egg.points = 2;
       spawnEgg(egg);
       
     }

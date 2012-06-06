@@ -619,16 +619,12 @@ package {
             _snake.body.remove(egg);
             soundCounter++;
             setTimeout(func, (300 / (expoCounter * expoCounter)) + 80 );
-          } else {
-            _combos += 1;
-          }
-        } else {
-          _combos += 1;
-        }
+          } 
+        } 
+ 
       }
 
       func();
-      //interval = setInterval(func, 300);
     }
     
     /*
