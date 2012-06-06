@@ -3,8 +3,9 @@ package {
   import org.axgl.text.*;
   import org.axgl.util.*;
   
-  public class Hud extends AxGroup{
-    [Embed(source='assets/images/icons/anzeigenbalken.png')] protected var Background:Class;
+  public class Hud extends AxGroup {
+    [Embed(source = 'assets/images/icons/anzeigenbalken.png')] protected var Background:Class;
+    [Embed(source = "assets/images/HUD/UIOverlay.png")] protected var Overlay:Class;
     [Embed(source='assets/images/icons/icon-combo.png')] protected var Combo:Class;
     [Embed(source='assets/images/icons/icon-lives.png')] protected var Lives:Class;
     [Embed(source='assets/images/icons/icon-poison.png')] protected var Poison:Class;
@@ -41,8 +42,7 @@ package {
 
     public function Hud(huds:Array) {
       super();
-      _bg = new AxSprite(10, 5);
-      _bg.load(Background);
+      _bg = new AxSprite(0,0, Overlay);
       add(_bg);
 
       _hash = { lives: [_lives, _livesText, 12],
@@ -111,6 +111,14 @@ package {
 
     public function set eggText(eggAmount:String):void {
       _eggText.text = eggAmount;
+    }
+    
+    override public function draw():void {
+      // HACK! This keeps the HUD from zooming.
+      var tempZoom:Number = Ax.zoom;
+      Ax.zoom = 1;
+      super.draw();
+      Ax.zoom = tempZoom;
     }
   }
 }

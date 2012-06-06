@@ -27,11 +27,15 @@ package {
     
     private var _startMps:Number;
     private var _emoLevel:int;    
+    
+    private var _startPosition:AxPoint;
 
-    public function Snake(movesPerSecond:Number = 1) { 
+    public function Snake(movesPerSecond:Number = 1, startPosition:AxPoint = null) { 
       super();
       _startMps = movesPerSecond;
       _timer = 0;
+      
+      _startPosition = startPosition;
 
       _head = new SmoothBlock(2, 2);
 
@@ -62,14 +66,14 @@ package {
       _body = new AxGroup();
       
       _followBox = new AxEntity(0,0);
-      _followBox.width = 150;
-      _followBox.height = 150;
+      _followBox.width = 100;
+      _followBox.height = 100;
 
       fillBody();
       resurrect();
 
       add(_body);
-      add(_followBox);
+      //add(_followBox);
       add(_head);
     }
 /********************************************
@@ -164,8 +168,8 @@ package {
     }
 
     private function resurrect():void {
-      _head.tileX = 9;
-      _head.tileY = 10;
+      _head.tileX = _startPosition.x;
+      _head.tileY = _startPosition.y;
       _head.offset.x = 15;
       _head.offset.y = 30;
       _previousFacing = _head.facing;
@@ -356,11 +360,12 @@ package {
       } else if (_head.y + _head.height > _followBox.y + _followBox.height) {
         _followBox.y = _head.y - (_followBox.height - _head.height);
       }      
+      // To get center etc.
+      //_followBox.update();
     }
     override public function update():void {
       super.update();
       
-      updateFollowBox();
       
       if(Ax.keys.pressed(AxKey.UP) && _previousFacing != AxEntity.DOWN){
         _head.facing = AxEntity.UP;
@@ -380,7 +385,7 @@ package {
       } 
 
       if(Ax.mouse.pressed(0)){
-        if(Ax.mouse.x > Ax.width / 2){
+        if(Ax.mouse.screen.x > Ax.width / 2){
           switch(_head.facing) {
             case AxEntity.UP:
               _head.facing = AxEntity.RIGHT;
@@ -448,6 +453,8 @@ package {
         }
         _timer -= _speed;
       }
+      updateFollowBox();
+
     }
   }
   

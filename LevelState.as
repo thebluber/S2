@@ -1,5 +1,6 @@
 package {
   import org.axgl.*;
+  import org.axgl.collision.AxGrid;
   import org.axgl.sound.*;
   import org.axgl.text.*;
   import org.axgl.particle.*;
@@ -92,13 +93,30 @@ package {
     
     protected var _spawnRotten:Boolean = false;
     protected var _rottenEggs:AxGroup;
-    protected var _rottenFrequency:Number = 2;
-    protected var _rottenSpawnTimer:Number = 2;
-
+    protected var _rottenFrequency:Number = 10;
+    protected var _rottenSpawnTimer:Number = 10;
+    
+    protected var _startPosition:AxPoint;
+    
+    protected var _radar:Radar;
+    
+    protected var _origZoom:Number;
+    
+    protected var _pointPool:AxGroup;
+    protected var _white:AxColor;
+    
+    public function LevelState() {
+      super();
+      _startPosition = new AxPoint(10, 10);
+    }
+    
     override public function create():void {
       super.create();
       
-      _font = AxFont.fromFont("Kroeger", true, 25, true);      
+      _font = AxFont.fromFont("Kroeger", true, 25, true);  
+      
+      _pointPool = new AxGroup;
+      _white = new AxColor(1, 1, 1, 1);
 
       //sound effects
       _biteSound = new AxSound(BiteSound);
@@ -114,8 +132,9 @@ package {
       _bup10 = new AxSound(Bup10);
       _soundEffects = [_bup1, _bup2, _bup3, _bup4, _bup5, _bup6, _bup7, _bup8, _bup9, _bup10];     
 
-      Ax.zoom = 1.5;
-
+      _origZoom = Ax.zoom;
+      Ax.zoom = 2.5;
+      
       _tweens = new Vector.<GTween>;
       
       _comboSet = new ComboSet();
@@ -141,10 +160,12 @@ package {
       _particles.add(AxParticleSystem.register(effect));
 
       _score = 0;
-      _snake = new Snake(10);
+      _snake = new Snake(10, _startPosition);
       Ax.camera.follow(_snake.followBox);
       Ax.camera.bounds = new AxRect(0,0,_levelWidth,_levelHeight);
       _food = new AxGroup();
+      
+      _radar = new Radar(_food, _snake);
 
       _bonusBar = new AxSprite(450,32);
       _bonusBar.scale.x = 0;
@@ -179,7 +200,6 @@ package {
 
       add(_hole);
 
-
       spawnFoods(3);
       add(_snake);
       add(_food);
@@ -187,7 +207,9 @@ package {
       add(_particles);
       add(_bonusBack);
       add(_bonusBar);
+      add(_pointPool);
       addHud();
+      add(_radar);
     }
 
     public function get snake():Snake {
@@ -330,7 +352,10 @@ package {
     }
     
     protected function collideObstacles():void {
-      if(_snake.alive && Ax.overlap(_snake.head, _obstacles)) {
+      var spr:AxSprite = new AxSprite(_snake.head.tileX * 15, _snake.head.tileY * 15);
+      spr.width = 15;
+      spr.height = 15;
+      if (_snake.alive && Ax.overlap(spr, _obstacles, null, new AxGrid(_levelWidth, _levelHeight))) {
         _snake.die();
       }
     }
@@ -380,7 +405,13 @@ package {
     }
 
     override public function update():void {
-      super.update();
+      //super.update();
+      _snake.update();
+      _food.update();
+      _rottenEggs.update();
+      _particles.update();
+      _radar.update();
+      
       
       _timeLeft -= Ax.dt;
 
@@ -445,15 +476,24 @@ package {
     }
 
     protected function showPoints(egg:AxSprite, points:String, color:AxColor = null, dx:int = 0, dy:int = 0 ):void {
-      var pointo:AxText = new AxText(egg.screen.x + dx, egg.screen.y + dy, _font, points);
+      var pointo:AxText;
+      pointo = (_pointPool.recycle() as AxText);
+      if (pointo != null) {
+        trace("Using recycled point display");
+        pointo.text = points;
+        pointo.x = egg.screen.x + dx;
+        pointo.y = egg.screen.y + dy;     
+      } else {
+        pointo = new AxText(egg.screen.x + dx, egg.screen.y + dy, _font, points);
+        _pointPool.add(pointo);
+      }
       pointo.scroll.x = 0;
       pointo.scroll.y = 0;
       pointo.scale.x = 0.5;
       pointo.scale.y = 0.5;
       pointo.alpha = 0.7;
-      if(color) {
-        pointo.color = color;
-      }
+      pointo.color = color ? color: _white;
+
       var func:Function = function(tween:GTween):void {
         pointo.exists = false; 
       }
@@ -463,7 +503,6 @@ package {
       _tweens.push(tween1);
       _tweens.push(tween2);
       _pointDirection = (_pointDirection + 1) % 4
-      add(pointo);
     } 
 
 
@@ -527,7 +566,8 @@ package {
     }
     
     public function showMessage(message:String):void {
-      var text:AxText = new AxText(snake.head.screen.x, snake.head.screen.y , _font, message);
+      var text:AxText = new AxText(Ax.width / 2, Ax.height / 2, _font, message);
+      text.zooms = false;
       text.scroll.x = 0;
       text.scroll.y = 0;
       text.scale.x = 2;
@@ -639,7 +679,7 @@ package {
       do {
         egg.tileX = int(1 + (Math.random() * wTiles));
         egg.tileY = int(6 + (Math.random() * hTiles));
-      } while (Ax.overlap(egg, _unspawnable));
+      } while (Ax.overlap(egg, _unspawnable, null, new AxGrid(_levelWidth, _levelHeight)));
       if (rotten) {
         _rottenEggs.add(egg);
       } else {
@@ -652,7 +692,7 @@ package {
         tween.end();
       }
       _tweens = null;
-      Ax.zoom = 1;
+      Ax.zoom = _origZoom;
       Ax.camera.reset();
       super.dispose();
     }
