@@ -11,8 +11,8 @@ package {
     protected var _background:AxSprite = null;
 
     override public function create():void {
-      _overlayOut = new AxSprite(110, 0, OverlayOut);
-      _overlayIn = new AxSprite(110, 0, OverlayIn);
+      _overlayOut = new AxSprite(-50, -50, OverlayOut);
+      _overlayIn = new AxSprite(-50, -50, OverlayIn);
       super.create();
 
       _comboSet.addCombo(new FasterCombo);

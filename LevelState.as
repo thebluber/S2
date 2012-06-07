@@ -41,6 +41,7 @@ package {
     protected var _overlayInTween:GTween;
     protected var _overlayOutTween:GTween;
     protected var _overlayTimer:int = 0;
+    protected var _resetAngle:Boolean = false;
 
     protected var _biteSound:AxSound;
     protected var _bup1:AxSound;
@@ -205,7 +206,6 @@ package {
 
       addBackgrounds();
       addObstacles();
-      addOverlay();
   
       _unspawnable = new AxGroup();
       _unspawnable.add(_food);
@@ -222,6 +222,7 @@ package {
       add(_bonusBack);
       add(_bonusBar);
       add(_pointPool);
+      addOverlay();
       addHud();
       add(_radar);
     }
@@ -432,12 +433,8 @@ package {
         
         add(_overlayIn);
         add(_overlayOut);
-        var func:Function = function(tween:GTween):void {
-          _overlayInTween.resetValues({angle: -3});
-          _overlayOutTween.resetValues({angle: 3});
-        }
-        _overlayInTween = new GTween(_overlayIn, 5, {angle:-3});
-        _overlayOutTween = new GTween(_overlayOut, 5, {angle:3});
+        _overlayInTween = new GTween(_overlayIn, 8, {angle:-3}, {ease: Sine.easeInOut});
+        _overlayOutTween = new GTween(_overlayOut, 10, {angle:3},{ease: Sine.easeInOut});
         _tweens.push(_overlayInTween); 
         _tweens.push(_overlayOutTween); 
         
@@ -446,18 +443,13 @@ package {
 
     protected function animateOverlay():void {
       _overlayTimer++;
-      if (_overlayTimer == 30) {
-        _overlayInTween.swapValues();
-        _overlayInTween.repeatCount = 4;
-        _overlayOutTween.swapValues();
-        _overlayOutTween.repeatCount = 4;
-        if (_overlayIn.angle == 4 && _overlayOut.angle == -3){
-        //_overlayInTween.setValues({angle: -3});
-        //_overlayOutTween.setValues({angle: 3});
-        } else {
-        //_overlayInTween.setValues({angle: 4});
-        //_overlayOutTween.setValues({angle: -3});
-        
+      if (_overlayTimer == 10) {
+        if (_overlayIn.angle == -3 && _overlayOut.angle == 3) {
+          _overlayInTween.setValues({angle: 4});
+          _overlayOutTween.setValues({angle: -3});
+        } else if (_overlayIn.angle == 4 && _overlayOut.angle == -3) {
+          _overlayInTween.setValues({angle: -3});
+          _overlayOutTween.setValues({angle: 3});
         }
         _overlayTimer = 0;
       }

@@ -4,11 +4,19 @@ package {
 
   public class Level3 extends LevelState {
     // Assets
-    [Embed(source='assets/images/level3bg.png')] protected var Background:Class;
+    [Embed(source='assets/images/Level03/level03.png')] protected var Background:Class;
+    [Embed(source='assets/images/Level03/level03_stein.png')] protected var Stone:Class;
+    [Embed(source='assets/images/Level03/SteinAugenGlühen.png')] protected var Eye:Class;
+    [Embed(source='assets/images/Level03/OverlayLV3Außen.png')] protected var OverlayOut:Class;
+    [Embed(source='assets/images/Level03/OverlayLV3Innen.png')] protected var OverlayIn:Class;
     // Variablen
     protected var _background:AxSprite = null;
+    private var _stone:AxSprite;
+    private var _evilEye:AxSprite;
 
     override public function create():void {
+      _overlayIn = new AxSprite(-50, -50, OverlayIn);
+      _overlayOut = new AxSprite(-50, -50, OverlayOut);
       super.create();
       _spawnRotten = true;
       _comboSet.addCombo(new FasterCombo);
@@ -22,10 +30,11 @@ package {
       _background.addAnimation('morph',[0,1],8);
       _background.animate('morph');
       add(_background);
+      _stone = new AxSprite(0, 0, Stone);
+      add(_stone);
     }
 
     override protected function addObstacles():void {
-      /*
       var stone:AxSprite = new AxSprite(180,225);      
       stone.create(75,45,0x00ff0000);
       _obstacles.add(stone);
@@ -33,7 +42,6 @@ package {
       stone.create(75,45,0x000000ff);
       _obstacles.add(stone);
       add(_obstacles);
-      */
     }
 
     override protected function spawnFood():void {
