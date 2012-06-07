@@ -442,16 +442,18 @@ package {
     } 
 
     protected function animateOverlay():void {
-      _overlayTimer++;
-      if (_overlayTimer == 10) {
-        if (_overlayIn.angle == -3 && _overlayOut.angle == 3) {
-          _overlayInTween.setValues({angle: 4});
-          _overlayOutTween.setValues({angle: -3});
-        } else if (_overlayIn.angle == 4 && _overlayOut.angle == -3) {
-          _overlayInTween.setValues({angle: -3});
-          _overlayOutTween.setValues({angle: 3});
+      if (_overlayIn && _overlayOut) {
+        _overlayTimer++;
+        if (_overlayTimer == 10) {
+          if (_overlayIn.angle == -3 && _overlayOut.angle == 3) {
+            _overlayInTween.setValues({angle: 4});
+            _overlayOutTween.setValues({angle: -3});
+          } else if (_overlayIn.angle == 4 && _overlayOut.angle == -3) {
+            _overlayInTween.setValues({angle: -3});
+            _overlayOutTween.setValues({angle: 3});
+          }
+          _overlayTimer = 0;
         }
-        _overlayTimer = 0;
       }
     }
 

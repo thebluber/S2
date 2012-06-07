@@ -57,7 +57,7 @@ package {
     }
 
     override protected function addHud():void {
-      _hud = new Hud(["lives", "speed", "time", "score", "combo", "poison"]); 
+      _hud = new Hud(["lives", "speed", "egg", "time", "score", "combo", "poison"]); 
       add(_hud);
     }
 
@@ -66,6 +66,7 @@ package {
       _hud.timeText = _timerHud;
       _hud.speedText = (_snakeSpeed < 10) ? "0" + String(_snakeSpeed) : String(_snakeSpeed);
       _hud.scoreText = String(_score); 
+      _hud.eggText = String(_eggAmount) + "/100";
       _hud.comboText = String(_combos) + "/10"; 
       _hud.poisonText = String(_poisonEgg);
     }

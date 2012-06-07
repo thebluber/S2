@@ -78,7 +78,7 @@ package {
       super.submitPoints();
     }
     override protected function checkWinConditions():Boolean {
-      return (_eggAmount >= 10);
+      return (_eggAmount >= 50);
     }
 
 
