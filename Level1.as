@@ -103,7 +103,10 @@ package {
       spawnEgg(egg);
       
     }
-
+    override protected function submitPoints():void {
+      _switchLevel.setTimer(int(_timerMin * 60 + _timerSec), 180);
+      super.submitPoints();
+    }
     override protected function checkWinConditions():Boolean {
       return (_eggAmount >= 50);
     }

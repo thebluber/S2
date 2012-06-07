@@ -20,6 +20,14 @@ package {
     [Embed(source='assets/score\ board/score.png')] protected var Score:Class;
     [Embed(source='assets/score\ board/time_bonus.png')] protected var TimeBonus:Class;
     [Embed(source='assets/score\ board/life_bonus.png')] protected var LifeBonus:Class;
+    [Embed(source='assets/score\ board/gold_small.png')] protected var GoldMedalSmall:Class;
+    [Embed(source='assets/score\ board/silver_small.png')] protected var SilverMedalSmall:Class;
+    [Embed(source='assets/score\ board/saphire_small.png')] protected var SaphireMedalSmall:Class;
+    [Embed(source='assets/score\ board/bronze_small.png')] protected var BronzeMedalSmall:Class;
+    [Embed(source='assets/score\ board/3D-Medaillen/medaille_bronze.png')] protected var BronzeMedal:Class;
+    [Embed(source='assets/score\ board/3D-Medaillen/medaille_gold.png')] protected var GoldMedal:Class;
+    [Embed(source='assets/score\ board/3D-Medaillen/medaille_silber.png')] protected var SilverMedal:Class;
+    [Embed(source='assets/score\ board/3D-Medaillen/medaille_saphir.png')] protected var SaphireMedal:Class;
     [Embed(source='assets/SnakeSounds/mouseclick.mp3')] protected var ClickSound:Class;
 
     private var _click:AxSound;    
@@ -33,6 +41,10 @@ package {
     private var _scoreboard:AxSprite;
     private var _leaderboard:AxSprite;
 
+    private var _medal:AxSprite;
+    private var _medalTween:GTween;
+    private var _medalSmall:Class;
+
     //birdemic birds
     private var _bird1:AxSprite;
     private var _bird2:AxSprite;
@@ -45,10 +57,13 @@ package {
     private var _scoreCounter:Object;
     private var _score:int;
 
+    private var _usedTime:int;
+    private var _timerLimit:int;
+    private var _timer:int;
+    private var _timerText:String;
+    private var _timerCounter:Object;
     private var _timeBonusPic:AxSprite;
     private var _timeBonusText:AxText;
-    private var _timeBCounter:Object;
-    private var _timeBonus:int;
 
     private var _liveBonusPic:AxSprite;
     private var _liveBonusText:AxText;
@@ -86,7 +101,6 @@ package {
       _scorePic = new AxSprite(_scoreboard.x + 20, _scoreboard.y + 80, Score);
       _scoreText = new AxText(_scorePic.x + _scorePic.width + 10, _scorePic.y - 10, _font, "");
 
-      _timeBCounter = {i: 0};
       _timeBonusPic = new AxSprite(_scorePic.x, _scorePic.y + _scorePic.height + 20, TimeBonus);
       _timeBonusText = new AxText(_timeBonusPic.x + _timeBonusPic.width + 10, _timeBonusPic.y - 10, _font, "");
 
@@ -192,30 +206,77 @@ package {
         _bird3.alpha = Number(_birds.alpha3);
     }
     
-    public function submitPoints(score:int, timeBonus:int, liveBonus:int, EXP:int):void {
+    public function submitPoints(score:int, liveBonus:int, EXP:int):void {
       _score = score;
-      _timeBonus = timeBonus;
       _liveBonus = liveBonus;
-      _total = _timeBonus + _liveBonus + _score;
       _EXP = EXP;
+      if (_timerCounter){
+        _total = (_timerLimit - _usedTime) * 5 + _score + _liveBonus;
+      } else {
+        _total = 0;
+      }
+    }
+
+    public function medal(tween:GTween):void {
+      var func:Function = function(tween:GTween):void {
+        _medalTween.setValues({x: 960});
+        if (_medal.x == 960) {
+          _medal.load(_medalSmall);
+          _medalTween.setValues({x: 320, y: 370});
+          _medalTween.autoPlay = false;
+        }
+      }
+      if (_total >= 200 && _total < 400) {
+        _medal = new AxSprite(-800, 0, BronzeMedal);
+        _medalSmall = BronzeMedalSmall;
+      } else if (_total >= 400 && _total < 600) {
+        _medal = new AxSprite(-800, 0, SaphireMedal);
+        _medalSmall = SaphireMedalSmall; 
+      } else if (_total >= 600 && _total < 800) {
+        _medal = new AxSprite(-800, 0, SilverMedal);
+        _medalSmall = SilverMedalSmall;
+      } else if (_total >= 800) {
+        _medal = new AxSprite(-800, 0, GoldMedal);
+        _medalSmall = GoldMedalSmall;
+      }
+
+      
+      if (_medal) {
+        _medalTween = new GTween(_medal, 2, {x: 105}, {ease: Elastic.easeOut, onComplete: func});
+        _tweens.push(_medalTween);
+        add(_medal);
+      }
+    }
+    //should be set before submitPoints
+    public function setTimer(usedTime:int, timerLimit:int):void{
+      _usedTime = usedTime;
+      _timerCounter = {i: _usedTime};
+      _timerLimit = timerLimit;
     }
 
     public function tweenPoints():void {
-      
+      var triggerTime:Function = function(tween:GTween):void {
+        if(_timerCounter) {
+          var tweenTimer:GTween = new GTween(_timerCounter, 2, {i: _timerLimit}, {onComplete: triggerLife});
+        _tweens.push(tweenTimer);
+        }
+      }
+
+      var triggerLife:Function = function(tween:GTween):void {
+        var tweenLive:GTween = new GTween(_liveBCounter, 2, {i: _liveBonus}, {ease: Exponential.easeOut, onComplete:func});
+        _tweens.push(tweenLive);
+      }
+
       var func:Function = function(tween:GTween):void {
-        var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut});
+        var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut, onComplete: medal});
         var tweenEXP:GTween = new GTween(_EXPCounter, 2, {i: _EXP}, {ease: Exponential.easeOut});
         _tweens.push(tweenTotal);
         _tweens.push(tweenEXP);
 
       }
+      var tweenScore:GTween = new GTween(_scoreCounter, 2, {i: _score}, {ease: Exponential.easeOut, onComplete: triggerTime});
 
-      var tweenScore:GTween = new GTween(_scoreCounter, 2, {i: _score}, {ease: Exponential.easeOut});
-      var tweenLive:GTween = new GTween(_liveBCounter, 2, {i: _liveBonus}, {ease: Exponential.easeOut});
-      var tweenTime:GTween = new GTween(_timeBCounter, 2, {i: _timeBonus}, {ease: Exponential.easeOut, onComplete: func});
       _tweens.push(tweenScore);
-      _tweens.push(tweenLive);
-      _tweens.push(tweenTime);
     }
 
     public function set score(score:int):void {
@@ -227,9 +288,16 @@ package {
       trigger();
         _scoreText.text = String(Math.floor(_scoreCounter.i));
         _liveBonusText.text = String(Math.floor(_liveBCounter.i));
-        _timeBonusText.text = String(Math.floor(_timeBCounter.i) * 5);
         _EXPText.text = String(Math.floor(_EXPCounter.i));
         _totalText.text = String(Math.floor(_totalCounter.i));
+
+        if (_timerCounter) {
+          var _min:String = "0" + String(int(Math.floor(_timerCounter.i) / 60));
+          var _sec:String = (Math.floor(_timerCounter.i) % 60) < 10 ? "0" + String(Math.floor(_timerCounter.i) % 60) : String(Math.floor(_timerCounter.i) % 60); 
+          _timerText = _min + ":" + _sec;
+          _timeBonusText.text = _timerText + " = " + String((Math.floor(_timerCounter.i) - _usedTime)  * 5);
+        }
+
     }
 
     public function switchToState(state:Class, button:AxButton):Function {

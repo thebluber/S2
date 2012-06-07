@@ -255,10 +255,9 @@ package {
     }
 
     protected function submitPoints():void {
-      var timeBonus:int = ((_timerMin * 60 + _timerSec) >= 120) ? 0 : (120 - (_timerMin * 60 + _timerSec));
       var liveBonus:int = (_snake.lives - 1) * 100;
       var _EXP:int = _eggAmount - _snake.body.members.length;
-      _switchLevel.submitPoints(_score, timeBonus, liveBonus, _EXP);
+      _switchLevel.submitPoints(_score, liveBonus, _EXP);
     }
     
     //to override in each level along with switchLevel()

@@ -66,5 +66,10 @@ package {
       return(_combos >= 10 || _eggAmount >= 100 || _timerMin >= 4)
     }
 
+    override protected function submitPoints():void {
+      _switchLevel.setTimer(int(_timerMin * 60 + _timerSec), 180);
+      super.submitPoints();
+    }
+
   }
 }
