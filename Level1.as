@@ -31,7 +31,6 @@ package {
       _treeShadow2.origin.x = Ax.width/2;
       _treeShadow2.origin.y = Ax.height/2;
       _treeShadow2.angle = 4;
-      _switchLevel = new SwitchLevel(Level1, Level2);
       _snake.lives = 1;
       animateShadow();     
       _switchLevel = new SwitchLevel(Level1, Level2);
@@ -108,7 +107,7 @@ package {
       super.submitPoints();
     }
     override protected function checkWinConditions():Boolean {
-      return (_eggAmount >= 50);
+      return (_eggAmount >= 10);
     }
 
 

@@ -35,6 +35,12 @@ package {
     [Embed(source='assets/images/hole.png')] protected var Hole:Class;
     
     private var _font:AxFont;
+    
+    protected var _overlayIn:AxSprite;
+    protected var _overlayOut:AxSprite;
+    protected var _overlayInTween:GTween;
+    protected var _overlayOutTween:GTween;
+    protected var _overlayTimer:int = 0;
 
     protected var _biteSound:AxSound;
     protected var _bup1:AxSound;
@@ -199,6 +205,7 @@ package {
 
       addBackgrounds();
       addObstacles();
+      addOverlay();
   
       _unspawnable = new AxGroup();
       _unspawnable.add(_food);
@@ -219,6 +226,9 @@ package {
       add(_radar);
     }
 
+/****************************************************
+*************getter/setter**************************/
+
     public function get snake():Snake {
       return _snake;
     }
@@ -234,6 +244,9 @@ package {
     public function get rottenEggs():AxGroup {
       return _rottenEggs;
     }
+
+
+/**************************************************/
     
     /* Sort of abstract functions */
     protected function addBackgrounds():void {
@@ -410,6 +423,46 @@ package {
       }
     }
 
+    protected function addOverlay():void {
+      if (_overlayIn && _overlayOut) {
+        _overlayIn.origin.x = _overlayOut.origin.x = Ax.width/2;
+        _overlayIn.origin.y = _overlayOut.origin.y = Ax.height/2;
+        _overlayIn.angle = 4;
+        _overlayOut.angle = -3;
+        
+        add(_overlayIn);
+        add(_overlayOut);
+        var func:Function = function(tween:GTween):void {
+          _overlayInTween.resetValues({angle: -3});
+          _overlayOutTween.resetValues({angle: 3});
+        }
+        _overlayInTween = new GTween(_overlayIn, 5, {angle:-3});
+        _overlayOutTween = new GTween(_overlayOut, 5, {angle:3});
+        _tweens.push(_overlayInTween); 
+        _tweens.push(_overlayOutTween); 
+        
+      }
+    } 
+
+    protected function animateOverlay():void {
+      _overlayTimer++;
+      if (_overlayTimer == 30) {
+        _overlayInTween.swapValues();
+        _overlayInTween.repeatCount = 4;
+        _overlayOutTween.swapValues();
+        _overlayOutTween.repeatCount = 4;
+        if (_overlayIn.angle == 4 && _overlayOut.angle == -3){
+        //_overlayInTween.setValues({angle: -3});
+        //_overlayOutTween.setValues({angle: 3});
+        } else {
+        //_overlayInTween.setValues({angle: 4});
+        //_overlayOutTween.setValues({angle: -3});
+        
+        }
+        _overlayTimer = 0;
+      }
+    }
+
     override public function update():void {
       //super.update();
       _snake.update();
@@ -418,6 +471,7 @@ package {
       _particles.update();
       _radar.update();
       
+      animateOverlay();
       
       _timeLeft -= Ax.dt;
 

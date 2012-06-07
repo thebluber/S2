@@ -242,7 +242,7 @@ package {
 
       
       if (_medal) {
-        _medalTween = new GTween(_medal, 2, {x: 105}, {ease: Elastic.easeOut, onComplete: func});
+        _medalTween = new GTween(_medal, 1.5, {x: 105}, {ease: Elastic.easeInOut, onComplete: func});
         _tweens.push(_medalTween);
         add(_medal);
       }
@@ -257,24 +257,24 @@ package {
     public function tweenPoints():void {
       var triggerTime:Function = function(tween:GTween):void {
         if(_timerCounter) {
-          var tweenTimer:GTween = new GTween(_timerCounter, 2, {i: _timerLimit}, {onComplete: triggerLife});
+          var tweenTimer:GTween = new GTween(_timerCounter, 1.5, {i: _timerLimit}, {onComplete: triggerLife});
         _tweens.push(tweenTimer);
         }
       }
 
       var triggerLife:Function = function(tween:GTween):void {
-        var tweenLive:GTween = new GTween(_liveBCounter, 2, {i: _liveBonus}, {ease: Exponential.easeOut, onComplete:func});
+        var tweenLive:GTween = new GTween(_liveBCounter, 1, {i: _liveBonus}, {ease: Exponential.easeOut, onComplete:func});
         _tweens.push(tweenLive);
       }
 
       var func:Function = function(tween:GTween):void {
-        var tweenTotal:GTween = new GTween(_totalCounter, 2, {i: _total}, {ease: Exponential.easeOut, onComplete: medal});
-        var tweenEXP:GTween = new GTween(_EXPCounter, 2, {i: _EXP}, {ease: Exponential.easeOut});
+        var tweenTotal:GTween = new GTween(_totalCounter, 1.5, {i: _total}, {ease: Exponential.easeOut, onComplete: medal});
+        var tweenEXP:GTween = new GTween(_EXPCounter, 1.5, {i: _EXP}, {ease: Exponential.easeOut});
         _tweens.push(tweenTotal);
         _tweens.push(tweenEXP);
 
       }
-      var tweenScore:GTween = new GTween(_scoreCounter, 2, {i: _score}, {ease: Exponential.easeOut, onComplete: triggerTime});
+      var tweenScore:GTween = new GTween(_scoreCounter, 1.5, {i: _score}, {ease: Exponential.easeOut, onComplete: triggerTime});
 
       _tweens.push(tweenScore);
     }

@@ -5,11 +5,16 @@ package {
   public class Level2 extends LevelState {
     // Assets
     [Embed(source='assets/images/level02bg.jpg')] protected var Background:Class;
+    [Embed(source='assets/images/Level2/OverlayLV2Außen.png')] protected var OverlayOut:Class;
+    [Embed(source='assets/images/Level2/OverlayLV2Innen.png')] protected var OverlayIn:Class;
     // Variablen
     protected var _background:AxSprite = null;
 
     override public function create():void {
+      _overlayOut = new AxSprite(110, 0, OverlayOut);
+      _overlayIn = new AxSprite(110, 0, OverlayIn);
       super.create();
+
       _comboSet.addCombo(new FasterCombo);
       _snake.lives = 3;
       _levelNumber = 2;
