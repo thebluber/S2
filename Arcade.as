@@ -24,7 +24,7 @@ package {
       
       sound().group("BGM").add("Arcade", BGM);
       var bgm:SoundItem = sound().group("BGM").item("Arcade");
-      bgm.onPlay(function() { bgm.volume = 0.3; } );
+      bgm.onPlay(function() :void { bgm.volume = 0.3; } );
       bgm.play();
       
       _comboSet.addCombo(new FasterCombo);

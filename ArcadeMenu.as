@@ -446,7 +446,7 @@ package
     }
    
     private function closeScreen(name:String):Function {
-      return function() {
+      return function():void {
         remove(_screens[name]);
         _menuLevel -= 1;
         updateButtonLevel();
