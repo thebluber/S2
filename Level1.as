@@ -7,13 +7,13 @@ package {
   public class Level1 extends LevelState {
     // Assets
     [Embed(source='assets/images/level01bg.png')] protected var Background:Class;
-    [Embed(source='assets/images/BaumschattenAußenLV1.png')] protected var ShadowOut:Class;
-    [Embed(source='assets/images/BaumschattenInnenLV1.png')] protected var ShadowIn:Class;
+    [Embed(source='assets/images/Level01/OverlayLV1Außen.png')] protected var ShadowOut:Class;
+    [Embed(source='assets/images/Level01/OverlayLV1Innen.png')] protected var ShadowIn:Class;
     // Variablen
     private var _background:AxSprite = null;
     override public function create():void {
-      _overlayIn = new AxSprite(Ax.width/2 - 600, Ax.height/2 - 450, ShadowIn);
-      _overlayOut = new AxSprite(Ax.width/2 - 600, Ax.height/2 - 450, ShadowOut);
+      _overlayIn = new AxSprite(-50, -50, ShadowIn);
+      _overlayOut = new AxSprite(-50, -50, ShadowOut);
       super.create();
       
       _comboSet.addCombo(new FasterCombo);
